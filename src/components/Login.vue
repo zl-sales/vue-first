@@ -2,7 +2,7 @@
   <div id="login-container">
     <div id="login-box">
       <div id="avatar-box">
-        <img src="../assets/img/logo.png" alt>
+        <img src="../assets/img/8.jpg" alt>
       </div>
       <div id="login-box">
         <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules">
@@ -30,6 +30,34 @@
 
 <script>
 export default {
+  methods: {
+    login() {
+      this.$refs.loginFormRef.validate(async Bool => {
+        if (Bool) {
+          const { data: info } = await this.$http.post('/login', this.loginForm)
+          console.log(info)
+          if (info.meta.status === 200) {
+            window.sessionStorage.setItem('token', info.data.token)
+            this.$message({
+              message: info.meta.msg,
+              type: 'success',
+              duration: 1000
+            })
+            return this.$router.push('/home')
+          } else {
+            this.$message({
+              message: info.meta.msg,
+              type: 'warning',
+              duration: 1000
+            })
+          }
+        }
+      })
+    },
+    resetForm() {
+      this.$refs.loginFormRef.resetFields()
+    }
+  },
   data() {
     return {
       // 登录form表单需要的数据对象
@@ -44,14 +72,6 @@ export default {
         ],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
       }
-    }
-  },
-  methods: {
-    login(){
-      
-    },
-    resetForm() {
-      this.$refs.loginFormRef.resetFields()
     }
   }
 }
