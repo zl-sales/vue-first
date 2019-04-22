@@ -2,7 +2,7 @@
   <div id="login-container">
     <div id="login-box">
       <div id="avatar-box">
-        <img src="../assets/img/8.jpg" alt>
+        <img src="../assets/img/logo.png" alt>
       </div>
       <div id="login-box">
         <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules">
@@ -17,9 +17,10 @@
             </el-input>
           </el-form-item>
           <el-row>
-            <el-col :offset="15">
-              <el-button type="primary" @click="login()">登录</el-button>
-              <el-button type="info" @click="resetForm()">重置</el-button>
+            <el-col :offset="9">
+              <!-- <el-button type="primary"  circle></el-button> -->
+              <el-button type="success" @click="login()" circle icon="el-icon-check"></el-button>
+              <el-button type="primary" @click="resetForm()" circle icon="el-icon-close"></el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -79,13 +80,14 @@ export default {
 
 <style lang="less" scoped>
 #login-container {
-  background-color: #2b4b6b;
+  // background-image: -webkit-radial-gradient(90deg,hotpink, lightskyblue);
+  background-image: -webkit-radial-gradient(0px 0px, hotpink, lightskyblue);
   height: 100%;
   overflow: hidden;
   #login-box {
     width: 450px;
     height: 304px;
-    background-color: #fff;
+    background-image: -webkit-radial-gradientrgb(76, 180, 232);
     border-radius: 4px;
     position: absolute;
     left: 50%;
@@ -98,7 +100,7 @@ export default {
       border: 1px solid #eee;
       border-radius: 50%;
       padding: 8px;
-      box-shadow: 0 0 10px #eee;
+      box-shadow: 0 0 10px lightgoldenrodyellow;
       position: absolute;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -118,5 +120,13 @@ export default {
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
+  .el-button:first-child {
+    background-image: -webkit-radial-gradient(0px 0px, hotpink, lightskyblue);
+    border: none;
+  }
+  .el-button:last-child {
+    background-image: -webkit-radial-gradient(0px 0px, lightskyblue, hotpink);
+    border: none;
+  }
 }
 </style>
