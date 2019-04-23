@@ -36,7 +36,6 @@ export default {
       this.$refs.loginFormRef.validate(async Bool => {
         if (Bool) {
           const { data: info } = await this.$http.post('/login', this.loginForm)
-          console.log(info)
           if (info.meta.status === 200) {
             window.sessionStorage.setItem('token', info.data.token)
             this.$message({

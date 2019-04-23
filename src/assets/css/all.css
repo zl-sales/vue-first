@@ -1,4 +1,11 @@
-html,body,#app{
-    padding: 0;margin: 0;
-    height:100%;
+html,
+body,
+#app {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+.el-submenu__title,
+.el-menu-item {
+  font-size: 13px;
 }
