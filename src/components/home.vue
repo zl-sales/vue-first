@@ -10,9 +10,9 @@
     <el-container>
       <el-aside :width="show?'65px':'200px'">
         <el-menu
-          background-color="#545c64"
+          background-color="black"
           text-color="#fff"
-          active-text-color="#409EFF"
+          active-text-color="#fff"
           :unique-opened="true"
           :router="true"
           :collapse="show"
@@ -20,7 +20,7 @@
         >
           <div id="button" @click="show=!show" :style="{width:show?'65px':'200px'}">|||</div>
           <el-submenu
-            :index="item.id"
+            :index="item.id + ''"
             v-for=" (item, k) in menulist"
             :key="item.id"
             :style="{width:show?'65px':'200px'}"
@@ -119,7 +119,7 @@ export default {
     }
   }
   .el-aside {
-    background-color: #333744;
+    background-color: black;
     .el-submenu {
       width: 200px;
     }
@@ -140,4 +140,8 @@ export default {
     }
   }
 }
+.el-main{
+  background-color: #eaedf1;
+}
+
 </style>

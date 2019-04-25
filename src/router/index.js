@@ -27,7 +27,7 @@ const router = new Router({
       redirect: '/wel',
       children: [
         { path: '/wel', component: welcome },
-        { path: '/users', component: users }
+        { path: '/users', component: users, props: true }
       ]
     }
   ]
@@ -46,9 +46,6 @@ axios.interceptors.request.use(
       config.headers.Authorization = token
     }
     return config
-  },
-  function(error) {
-    return Promise.reject(error)
   }
 )
 

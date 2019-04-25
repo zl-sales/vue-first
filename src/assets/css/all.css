@@ -9,3 +9,31 @@ body,
 .el-menu-item {
   font-size: 13px;
 }
+.el-header{
+  background-image: url(../img/top.jpg);
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+.el-aside{
+  background-image: url(../img/bj.jpg);
+  background-repeat: no-repeat;
+  /* background-size: 100% 100%; */
+}
+.el-menu{
+  opacity: .5;
+}
+.el-main{
+  background-image: url(../img/bj.jpg);
+  background-size: 100% 110%;
+  background-repeat: no-repeat
+}
+.el-card{
+  border:none;
+ background-color: rgba(255, 255, 255, .3)
+} 
+.el-pagination__jump, .el-pagination__total{
+  color: aliceblue
+}
+.el-breadcrumb span{
+  color: #fff !important
+}
