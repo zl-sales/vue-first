@@ -3,7 +3,7 @@
     <el-header>
       <div class="logo-box">
         <img src="../assets/img/heima.png" alt>
-        <span>第一次使用Vue独立完成项目</span>
+        <span>浩方电商后台管理系统</span>
       </div>
       <el-button type="danger" @click="loginout">退出</el-button>
     </el-header>
@@ -75,7 +75,6 @@ export default {
         this.$message.danger(dt.meta.msg)
       }
       this.menulist = dt.data
-      console.log(this.menulist)
     }
   },
   data() {

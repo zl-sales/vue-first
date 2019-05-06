@@ -9,31 +9,37 @@ body,
 .el-menu-item {
   font-size: 13px;
 }
-.el-header{
+.el-header {
   background-image: url(../img/top.jpg);
   background-repeat: no-repeat;
   background-size: 100%;
 }
-.el-aside{
+.el-aside {
   background-image: url(../img/bj.jpg);
   background-repeat: no-repeat;
   /* background-size: 100% 100%; */
 }
-.el-menu{
-  opacity: .5;
+.el-menu {
+  opacity: 0.5;
 }
-.el-main{
+.el-main {
   background-image: url(../img/bj.jpg);
   background-size: 100% 110%;
-  background-repeat: no-repeat
+  background-repeat: no-repeat;
 }
-.el-card{
+.el-card {
   border:none;
- background-color: rgba(255, 255, 255, .3)
-} 
-.el-pagination__jump, .el-pagination__total{
-  color: aliceblue
+  background-color: rgba(255, 255, 255, 0.9);
 }
-.el-breadcrumb span{
-  color: #fff !important
+.el-pagination__jump,
+.el-pagination__total {
+  color: aliceblue;
+}
+.el-breadcrumb span {
+  color: #fff !important;
+  margin-bottom: 15px;
+}
+.el-table {
+  border-radius: 6px;
+  margin-top: 15px;
 }

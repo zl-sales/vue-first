@@ -4,7 +4,7 @@ const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
@@ -30,6 +30,18 @@ module.exports = {
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath
+  },
+  // webpack-cdn配置
+  externals: {
+    // key-> 包名->package.json
+    // value-> 该包的源码中暴露在全局作用域下的变量名-> eg: jQuery.js->window.$ | window.jQuery
+    vue: 'Vue',
+    'vue-router': 'VueRouter',
+    'element-ui': 'ELEMENT',
+    axios: 'axios',
+    moment: 'moment',
+    echarts: 'echarts',
+    nprogress: 'NProgress'
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],

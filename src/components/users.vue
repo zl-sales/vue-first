@@ -6,7 +6,6 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
-
     <!-- 卡片组件 -->
     <el-card class="box-card">
       <!--搜索框 和 添加按钮-->
@@ -28,6 +27,35 @@
           <el-button type="primary" @click="addFormVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
+
+      <!-- 分配角色弹出层 -->
+      <el-dialog
+        title="分配角色"
+        :visible.sync="setroleFormVisible"
+        @close="$refs.setrolefromref.resetFields()"
+      >
+        <el-form :model="setroleform" :rules="setroleFormrules" ref="setrolefromref">
+          <el-form-item
+            label="当前用户："
+            :label-width="setroleformLabelWidth"
+            prop="username"
+          >{{setroleform.username}}</el-form-item>
+          <el-form-item
+            label="当前角色："
+            :label-width="setroleformLabelWidth"
+            prop="role_name"
+          >{{setroleform.role_name}}</el-form-item>
+          <el-form-item label="分配的角色：" prop="rid">
+            <el-select v-model="setroleform.rid" placeholder="请选择">
+              <el-option v-for="v in roleinfo" :key="v.id" :label="v.roleName" :value="v.id"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="setroleFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="getrole()">确 定</el-button>
+        </div>
+      </el-dialog>
 
       <!-- 添加用户弹出层 -->
       <el-dialog title="添加用户" :visible.sync="addFormVisible" @close="addclose">
@@ -51,25 +79,24 @@
         </div>
       </el-dialog>
 
-      <!-- 编辑用户信息的弹出框 -->
-      <el-dialog title="修改用户" :visible.sync="editFormVisible">
-        <el-form :model="editform" ref="edifromref" :rules="editfromrules">
+      <!-- 编辑用户信息的弹出框-->
+      <el-dialog title="添加用户" :visible.sync="editFormVisible">
+        <el-form :model="editform" :rules="editFormrules" ref="ediformref">
           <el-form-item label="用户名" :label-width="editformLabelWidth" prop="username">
-            <el-input placeholder="请输入内容" v-model="editform.username" :disabled="true"></el-input>
+            <el-input v-model="editform.username" disabled></el-input>
           </el-form-item>
-          <el-form-item label="邮箱" :label-width="editformLabelWidth" prop="editform.email">
-            <el-input placeholder="请输入内容" v-model="editform.email"></el-input>
+          <el-form-item label="手机号码" :label-width="editformLabelWidth" prop="mobile">
+            <el-input v-model="editform.mobile" autocomplete="off" :maxlength="11"></el-input>
           </el-form-item>
-          <el-form-item label="手机号码" :label-width="editformLabelWidth" prop="editform.mobile">
-            <el-input placeholder="请输入内容" v-model="editform.mobile" :maxlength="11"></el-input>
+          <el-form-item label="邮箱" :label-width="editformLabelWidth" prop="email">
+            <el-input v-model="editform.email" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="editFormVisible = false">取 消</el-button>
-          <el-button type="primary">确 定</el-button>
+          <el-button type="primary" @click="edituser">确 定</el-button>
         </div>
       </el-dialog>
-
       <!-- 表格 -->
       <el-table :data="tableData" border style="width: 100%" :stripe="true">
         <el-table-column type="index" label="序号" width="60"></el-table-column>
@@ -79,10 +106,11 @@
         <el-table-column prop="email" label="邮箱" width="160"></el-table-column>
         <el-table-column prop="mg_state" label="状态" width="60">
           <el-switch
-            v-model="bool.row.mg_state"
-            slot-scope="bool"
+            v-model="info.row.mg_state"
+            slot-scope="info"
             active-color="#13ce66"
             inactive-color="#cccccc"
+            @change="kaiguan(info.row.id,info.row.mg_state)"
           ></el-switch>
 
           <!-- 此处使用<slot-scoped方式获取当值 -->
@@ -90,11 +118,11 @@
         </el-table-column>
         <el-table-column prop="operation" label="操作" width="250">
           <!-- 三个按钮 -->
-          <template slot-scope="bol">
+          <template slot-scope="info">
             <!-- 编辑按钮 -->
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="edit(bol.row.id)"></el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="edit(info.row.id)"></el-button>
             <!-- 删除按钮 -->
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="dele(bol.row.id)"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="dele(info.row.id)"></el-button>
             <!-- 分配角色按钮 -->
             <el-tooltip
               class="item"
@@ -103,7 +131,12 @@
               placement="top"
               :enterable="false"
             >
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+                @click="setrole(info.row)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -115,25 +148,80 @@
         :current-page="page.pagenum"
         :page-size="page.pagesize"
         :page-sizes="[2, 4, 6, 8]"
-        layout="total,  sizes, prev, pager, next, jumper"
+        layout="total, sizes, prev, pager, next, jumper"
         :total="page.tatol"
       ></el-pagination>
     </el-card>
   </div>
 </template>
-
 <script>
 export default {
   created() {
     this.getusersinfo()
   },
   methods: {
+    // 开启或关闭状态开关
+    async kaiguan(id, state) {
+      const { data: dt } = await this.$http.put(`users/${id}/state/${state}`)
+      if (dt.meta.status !== 200) {
+        return this.$message.error(dt.meta.msg)
+      }
+      this.$message.success(dt.meta.msg)
+    },
+    // 分配角色
+    async getrole() {
+      const { data: dt } = await this.$http.put(
+        `users/${this.setroleform.id}/role`,
+        {
+          rid: this.setroleform.rid
+        }
+      )
+      if (dt.meta.status !== 200) {
+        return this.$message.error(dt.meta.msg)
+      }
+      this.$message.success(dt.meta.msg)
+      this.setroleFormVisible = false
+      this.getusersinfo()
+    },
+    // 打开分配角色弹出框 获取数据渲染弹出框
+    async setrole(user) {
+      const { data: dt } = await this.$http.get('roles')
+      if (dt.meta.status !== 200) {
+        return this.$message.error(dt.meta.msg)
+      }
+      // 渲染到弹出框上的数据
+      this.setroleform = user
+      // 下来菜单
+      this.roleinfo = dt.data
+      // 打开弹出框
+      this.setroleFormVisible = true
+    },
+    // 点击修改弹窗的确定按钮，发送axios请求，修改数据
+    edituser() {
+      this.$refs.ediformref.validate(async val => {
+        if (val) {
+          const { data: dt } = await this.$http.put(
+            'users/' + this.editform.id,
+            this.editform
+          )
+          if (dt.meta.status !== 200) {
+            return this.$message.error(dt.meta.msg)
+          }
+          this.editFormVisible = false
+          this.$message.success(dt.meta.msg)
+          this.getusersinfo()
+        }
+      })
+    },
     // 打开修改用户弹窗，并且发送axios请求获取数据，渲染弹窗、
     async edit(id) {
-      var { data } = await this.$http.get('/users/' + id)
-      this.editform = data.data
-      console.log(this.editform)
       this.editFormVisible = true
+      const { data } = await this.$http.get('users/' + id)
+      // console.log(data)
+      if (data.meta.status !== 200) {
+        return this.$message.error(data.meta.msg)
+      }
+      this.editform = data.data
     },
     // 通过id删除该条数据
     dele(ids) {
@@ -143,7 +231,7 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          var { data } = await this.$http.delete('/users/' + ids)
+          var { data } = await this.$http.delete('users/' + ids)
           // console.log(data)
           // console.log(ids)
           this.getusersinfo()
@@ -151,19 +239,22 @@ export default {
             type: 'success',
             message: data.meta.msg
           })
+          if (this.tableData.length === 1 && this.page.pagenum !== 1) {
+            this.page.pagenum--
+          }
         })
         .catch(() => {
           return false
         })
     },
-    // 关闭弹出框后，清空表单数据
+    // 关闭添加用户弹出框后，清空表单数据
     addclose() {
       this.$refs.addfromref.resetFields()
     },
     // 添加用户
     add() {
-      this.$refs.addfromref.validate(async Bool => {
-        if (Bool) {
+      this.$refs.addfromref.validate(async val => {
+        if (val) {
           var { data } = await this.$http.post('/users', this.addform)
           // console.log(data)
           this.$message.success(data.meta.msg)
@@ -173,10 +264,12 @@ export default {
         }
       })
     },
+    // 分页器切换页码时触发的函数方法
     handleCurrentChange(val) {
       this.page.pagenum = val
       this.getusersinfo()
     },
+    // 分页器切换页码时触发的函数方法
     handleSizeChange(val) {
       this.page.pagesize = val
       this.getusersinfo()
@@ -186,18 +279,60 @@ export default {
       var { data: list } = await this.$http.get('/users', {
         params: this.page
       })
-      console.log(list)
+      // console.log(list)
       this.tableData = list.data.users
       this.page.tatol = list.data.total
     }
   },
   data() {
+    var checkemail = (rule, value, callback) => {
+      const reg = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/
+      // 如果不符合正则表达式的条件的话则触发下边代码
+      if (!reg.test(value)) {
+        return callback(new Error('请输入正确的邮箱地址'))
+      }
+      callback()
+    }
+    var checkmobile = (rule, value, callback) => {
+      const rega = /^1[35789]\d{9}$/
+      // 如果不符合正则表达式的条件的话则触发下边代码
+      if (!rega.test(value)) {
+        return callback(new Error('请输入正确的手机号码'))
+      }
+      callback()
+    }
     return {
+      // 显示在分配角色弹出框的数据。
+      roleinfo: [],
+      setroleFormrules: {
+        rid: [
+          {
+            required: true,
+            message: '请选择一个角色',
+            trigger: 'change'
+          }
+        ]
+      },
+      // 存储分配角色表单的对象成员
+      setroleform: {
+        username: '',
+        role_name: '',
+        rid: 0
+      },
       // 编辑用户信息的表单数据的验证规则
-      editfromrules: {
-        email: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
+      editFormrules: {
         mobile: [
-          { required: true, message: '请输入正确的手机号码', trigger: 'blur' }
+          {
+            required: true,
+            message: '此项必填',
+            trigger: 'blur'
+          },
+          { validator: checkmobile, trigger: 'blur' }
+        ],
+
+        email: [
+          { required: false, trigger: 'blur' },
+          { validator: checkemail, trigger: 'change' }
         ]
       },
       // 编辑用户信息的表单数据
@@ -206,15 +341,13 @@ export default {
         email: '',
         mobile: ''
       },
-      props: ['id'],
-      // 存储表格数据的
+      // 存储table表格数据的
       tableData: [],
-
       // 分页的功能
       page: {
         query: '',
         pagenum: 1,
-        pagesize: 2
+        pagesize: 6
       },
       // 添加表单的规则
       addFormrules: {
@@ -227,32 +360,40 @@ export default {
         mobile: [
           {
             required: true,
-            message: '请输入正确的手机号码',
+            message: '此项必填',
             trigger: 'blur'
-          }
+          },
+          { validator: checkmobile, trigger: 'blur' }
         ],
-        email: [{ required: false, message: '此项为必填项', trigger: 'blur' }]
+
+        email: [
+          { required: false, trigger: 'blur' },
+          { validator: checkemail, trigger: 'change' }
+        ]
       },
-      // 添加表单的开关
-      addFormVisible: false,
+
+      // 添加用户表单的对象成员
       addform: {
         username: '',
         password: '',
         mobile: '',
         email: ''
       },
+      setroleformLabelWidth: '100px',
       addformLabelWidth: '100px',
       editformLabelWidth: '100px',
+      // 添加表单的开关
+      addFormVisible: false,
       // edit显示开关
-      editFormVisible: false
+      editFormVisible: false,
+      // 分配用户角色开关
+      setroleFormVisible: false
     }
   }
 }
 </script>
-
 <style lang="less" scoped>
 .box-card {
-  margin-top: 15px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
 }
 .el-table {
